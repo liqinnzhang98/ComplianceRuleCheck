@@ -1,0 +1,59 @@
+@startuml
+
+abstract class QueryGenerator {
+  - eventLog: EventLogModel
+  - templateValues: Map<String, String>
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+enum QueryOperatorEnum {
+  LESS_THAN,
+  NOT_EQUALS,
+  GREATER_THAN_OR_EQUALS
+}
+
+class TimeTemplateQueryGenerator {
+  - operator: QueryOperatorEnum
+  - taskP: String
+  - taskQ: String
+  - kUnit: String
+  - kTime: String
+  - kValue: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class TimeAtLeastAfterQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class TimeExactlyAfterQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class TimeExactlyAtQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class TimeWithinLeadsToQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class TimeWithinTaskTimeQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+QueryGenerator <|-- TimeTemplateQueryGenerator
+TimeTemplateQueryGenerator <|-- TimeAtLeastAfterQueryGenerator
+TimeTemplateQueryGenerator <|-- TimeExactlyAfterQueryGenerator
+TimeTemplateQueryGenerator <|-- TimeExactlyAtQueryGenerator
+TimeTemplateQueryGenerator <|-- TimeWithinLeadsToQueryGenerator
+TimeTemplateQueryGenerator <|-- TimeWithinTaskTimeQueryGenerator
+
+@enduml

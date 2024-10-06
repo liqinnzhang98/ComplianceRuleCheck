@@ -1,0 +1,48 @@
+reviewers:
+    # The default reviewers
+    defaults:
+        - edisonyls
+        - irgiob
+        - TBrotchie
+        - pruthvi145
+
+    # Reviewer groups each of which has a list of GitHub usernames
+    groups:
+        front-end:
+            - edisonyls
+            - irgiob
+            - pruthvi145
+            - xinlanSong
+        back-end:
+            - JunXu-1
+            - irgiob
+            - Hanxiang-WANG
+            - TBrotchie
+            - pruthvi145
+            - obb0928
+        devops:
+            - pruthvi145
+            - luiszengii
+
+files:
+    # Keys are glob expressions.
+    # You can assign groups defined above as well as GitHub usernames.
+    'frontend/**':
+        - front-end # group
+
+    'backend/**':
+        - back-end # group
+
+    '.github/**':
+        - devops
+
+options:
+    ignore_draft: true
+    ignored_keywords:
+        - ignore
+    enable_group_assignment: false
+    number_of_reviewers: 3
+
+    # If it's true, the last matching files-change pattern takes the most precedence (CODEOWNERS-compatible)
+    # See https://github.com/necojackarc/auto-request-review/pull/80 for more details.
+    last_files_match_only: true

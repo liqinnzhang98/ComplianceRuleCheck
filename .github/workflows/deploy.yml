@@ -1,0 +1,83 @@
+name: Deploy to Server
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Generate datasource.properties for build
+              run: |
+                  touch datasource.properties
+                  echo spring.datasource.url=jdbc:mysql://db:3306/${{ secrets.DB_NAME }} >> datasource.properties
+                  echo spring.datasource.username=${{ secrets.DB_USERNAME }} >> datasource.properties
+                  echo spring.datasource.password=${{ secrets.DB_ROOT_PASSWORD }} >> datasource.properties
+                  echo recommender.hostname=${{ secrets.RECOMMENDER_HOSTNAME }} >> datasource.properties
+
+            - name: Build and push Docker image
+              env:
+                  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+                  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+              run: |
+                  echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+
+                  docker build -t $DOCKERHUB_USERNAME/apromore_compliance_centre:${{github.ref_name}} .
+
+                  docker tag $DOCKERHUB_USERNAME/apromore_compliance_centre:${{github.ref_name}} $DOCKERHUB_USERNAME/apromore_compliance_centre:latest
+
+                  docker push $DOCKERHUB_USERNAME/apromore_compliance_centre:latest
+                  docker push $DOCKERHUB_USERNAME/apromore_compliance_centre:${{github.ref_name}}
+
+            - name: Install htpasswd for basic auth password hashing
+              run: sudo apt-get install -y apache2-utils
+
+            - name: Generate docker compose environment file
+              run: |
+                  touch .env
+                  echo APP_VERSION=${{github.ref_name}} >> .env
+                  echo MYSQL_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }} >> .env
+                  echo MYSQL_DATABASE=${{ secrets.DB_NAME }} >> .env
+                  echo APP_BASICAUTH_USER=${{ secrets.APP_BASICAUTH_USER }} >> .env
+
+                  # Generate a bcrypt password for the basic auth password
+                  BCRYPT_PASSWORD=$(htpasswd -nbBC 10 "" ${{ secrets.APP_BASICAUTH_PASSWORD }} | tr -d ':')
+
+                  # Escape the $ in the bcrypt password so that it can be used in the .env file
+                  ESCAPED_BCRYPT_PASSWORD=$(echo "$BCRYPT_PASSWORD" | sed 's/\$/\$\$/g')
+
+                  echo APP_BASICAUTH_PASSWORD=$ESCAPED_BCRYPT_PASSWORD >> .env
+                  echo SERVER_URL=${{ secrets.SERVER_URL }} >> .env
+
+            - name: Deploy on Server
+              env:
+                  PRIVATE_KEY: ${{ secrets.SERVER_PRIVATE_KEY  }}
+                  HOSTNAME: ${{ secrets.SERVER_HOSTNAME  }}
+                  USERNAME: ${{ secrets.SERVER_USERNAME  }}
+                  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+                  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+              run: |
+                  echo "$PRIVATE_KEY" > private_key && chmod 400 private_key
+                  scp -o StrictHostKeyChecking=no -i private_key docker-compose.yml ${USERNAME}@${HOSTNAME}:~/apromore_compliance_centre
+                  scp -o StrictHostKeyChecking=no -i private_key Caddyfile ${USERNAME}@${HOSTNAME}:~/apromore_compliance_centre
+                  scp -o StrictHostKeyChecking=no -i private_key .env ${USERNAME}@${HOSTNAME}:~/apromore_compliance_centre
+                  ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
+                    cd ~/apromore_compliance_centre
+
+                    # login to docker hub
+                    echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+
+                    # Stop and remove the current container
+                    sudo docker compose down
+
+                    # Start the container
+                    sudo docker compose up -d
+
+                    # Remove unused images
+                    sudo docker image prune -f
+                  '

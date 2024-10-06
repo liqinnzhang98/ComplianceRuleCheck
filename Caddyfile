@@ -1,0 +1,7 @@
+{$SERVER_URL} {
+    reverse_proxy app:8080
+
+    basicauth {
+        {$APP_BASICAUTH_USER} {$APP_BASICAUTH_PASSWORD}
+    }
+}

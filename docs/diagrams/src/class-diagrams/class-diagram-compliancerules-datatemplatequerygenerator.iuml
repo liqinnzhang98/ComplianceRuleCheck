@@ -1,0 +1,51 @@
+@startuml
+
+abstract class QueryGenerator {
+  - eventLog: EventLogModel
+  - templateValues: Map<String, String>
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class DataTemplateQueryGenerator {
+  - operator: QueryOperatorEnum
+  - attributeX: String
+  - attributeY: String
+  - valueY: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class DataEqualsQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class DataIsGreaterThanOrEqualsQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class DataIsGreaterThanQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class DataIsLessThanOrEqualsQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class DataIsLessThanQueryGenerator {
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+QueryGenerator <|-- DataTemplateQueryGenerator
+DataTemplateQueryGenerator <|-- DataEqualsQueryGenerator
+DataTemplateQueryGenerator <|-- DataIsGreaterThanOrEqualsQueryGenerator
+DataTemplateQueryGenerator <|-- DataIsGreaterThanQueryGenerator
+DataTemplateQueryGenerator <|-- DataIsLessThanOrEqualsQueryGenerator
+DataTemplateQueryGenerator <|-- DataIsLessThanQueryGenerator
+
+@enduml

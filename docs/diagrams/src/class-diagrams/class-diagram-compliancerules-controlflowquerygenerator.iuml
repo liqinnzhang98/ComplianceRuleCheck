@@ -1,0 +1,42 @@
+@startuml
+
+abstract class QueryGenerator {
+  - eventLog: EventLogModel
+  - templateValues: Map<String, String>
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ControlFlowDirectlyFollowedByQueryGenerator {
+  - taskP: String
+  - taskQ: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ControlFlowEventuallyFollowedByQueryGenerator {
+  - taskP: String
+  - taskQ: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ControlFlowExistsQueryGenerator {
+  - taskP: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ControlFlowPrecedesQueryGenerator {
+  - taskP: String
+  - taskQ: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+QueryGenerator <|-- ControlFlowDirectlyFollowedByQueryGenerator
+QueryGenerator <|-- ControlFlowEventuallyFollowedByQueryGenerator
+QueryGenerator <|-- ControlFlowExistsQueryGenerator
+QueryGenerator <|-- ControlFlowPrecedesQueryGenerator
+
+@enduml

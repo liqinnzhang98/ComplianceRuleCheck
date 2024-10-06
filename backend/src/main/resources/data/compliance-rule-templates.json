@@ -1,0 +1,835 @@
+[
+    {
+        "category": "CONTROL_FLOW",
+        "id": 1,
+        "rule": "Precedes",
+        "description": "Task P must precede task Q",
+        "example": "A credit check task must precede a credit offer",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "precedes",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_q",
+                "label": "Task Q",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            }
+        ]
+    },
+    {
+        "category": "CONTROL_FLOW",
+        "id": 2,
+        "rule": "Directly Followed By",
+        "description": "Task Q must immediately follow task P",
+        "example": "A credit offer must be followed by a task to send the offer to the customer",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "directly followed by",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_q",
+                "label": "Task Q",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            }
+        ]
+    },
+    {
+        "category": "CONTROL_FLOW",
+        "id": 3,
+        "rule": "Eventually Followed By",
+        "description": "Task Q must occur after task P",
+        "example": "An offer must eventually be accepted, cancelled or refused",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "eventually followed by",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_q",
+                "label": "Task Q",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            }
+        ]
+    },
+    {
+        "category": "CONTROL_FLOW",
+        "id": 4,
+        "rule": "Exists",
+        "description": "Task P must occur at least once",
+        "example": "The provider must communicate the decision to the customer",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "exists",
+                "type": "TEXT"
+            }
+        ]
+    },
+    {
+        "category": "RESOURCE",
+        "id": 5,
+        "rule": "Performed By",
+        "description": "Task t must be performed by resource R",
+        "example": "The credit check must be performed by a credit analyst",
+        "formFields": [
+            {
+                "name": "task_t",
+                "label": "Task T",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "performed by",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "resource_r",
+                "label": "Resource R",
+                "type": "SELECT",
+                "selectFrom": "RESOURCE"
+            }
+        ]
+    },
+    {
+        "category": "RESOURCE",
+        "id": 6,
+        "rule": "Segregated From",
+        "description": "Task t1 and t2 must be performed by different roles and users",
+        "example": "The credit check and document check must be performed by different roles and people",
+        "formFields": [
+            {
+                "name": "task_1",
+                "label": "Task 1",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "segregated from",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_2",
+                "label": "Task 2",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            }
+        ]
+    },
+    {
+        "category": "RESOURCE",
+        "id": 7,
+        "rule": "User Segregated From",
+        "description": "Task t1 and t2 must be performed by different users",
+        "example": "For loans over $1m the credit check has to be performed by two different credit analysts",
+        "formFields": [
+            {
+                "name": "task_1",
+                "label": "Task 1",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "user segregated from",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_2",
+                "label": "Task 2",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            }
+        ]
+    },
+    {
+        "category": "RESOURCE",
+        "id": 8,
+        "rule": "Bounded with",
+        "description": "Task t1 and t2 must be performed by the same user",
+        "example": "Where a customer's application has missing documentation, the operator checking the documents must be the operator to contact the customer",
+        "formFields": [
+            {
+                "name": "task_1",
+                "label": "Task 1",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "bounded with",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_2",
+                "label": "Task 2",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            }
+        ]
+    },
+    {
+        "category": "RESOURCE",
+        "id": 9,
+        "rule": "Role Bounded With",
+        "Form": "(t1, t2) bounded with R1",
+        "description": "Task t1 and t2 must be performed by the same role but different users",
+        "example": "The offer follow-up call and the document checking task must be performed by document checking analysts",
+        "formFields": [
+            {
+                "name": "task_1",
+                "label": "Task 1",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "task_2",
+                "label": "Task 2",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "bounded with",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "role_r",
+                "label": "Role R",
+                "type": "SELECT",
+                "selectFrom": "ROLE"
+            }
+        ]
+    },
+    {
+        "category": "TIME",
+        "id": 10,
+        "rule": "Within - Leads To",
+        "description": "Task Q must occur within k time units after task P",
+        "example": "Documents must be returned for checking within 14 days of an offer being made",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "leads to",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_q",
+                "label": "Task Q",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break_3",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text_2",
+                "text": "within",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_4",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "duration_k",
+                "label": "Duration",
+                "type": "DURATION"
+            }
+        ]
+    },
+    {
+        "category": "TIME",
+        "id": 11,
+        "rule": "Within - Task Time",
+        "description": "Task P must happen within k time units",
+        "example": "The credit decision must be made within 5 days",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "within",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "duration_k",
+                "label": "Select Duration",
+                "type": "DURATION"
+            }
+        ]
+    },
+    {
+        "category": "TIME",
+        "id": 12,
+        "rule": "At Least After",
+        "Form": "P leads to Q at least after k",
+        "description": "Task Q must occur at least k time units after task P",
+        "example": "The follow-up call must be made at least 48 hours after an offer has been sent out",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "leads to",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_q",
+                "label": "Task Q",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break_3",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text_2",
+                "text": "at least after",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_4",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "duration_k",
+                "label": "Select Duration",
+                "type": "DURATION"
+            }
+        ]
+    },
+    {
+        "category": "TIME",
+        "id": 13,
+        "rule": "Exactly At",
+        "description": "Task Q must follow task P at exactly time k",
+        "example": "The credit refusal report must be issued at 4pm each day",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "leads to",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_q",
+                "label": "Task Q",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break_3",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text_2",
+                "text": "at exactly",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_4",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "time_k",
+                "label": "Time",
+                "type": "TIME"
+            }
+        ]
+    },
+    {
+        "category": "TIME",
+        "id": 14,
+        "rule": "Exactly After",
+        "Form": "P leads to Q exactly after k",
+        "description": "Task Q must occur exactly k time units after task P",
+        "example": "The approved loan report is updated 15 minutes after the offer has been accepted",
+        "formFields": [
+            {
+                "name": "task_p",
+                "label": "Task P",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "leads to",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "task_q",
+                "label": "Task Q",
+                "type": "SELECT",
+                "selectFrom": "ACTIVITY"
+            },
+            {
+                "name": "column_break_3",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text_2",
+                "text": "exactly after",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_4",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "duration_k",
+                "label": "Duration",
+                "type": "DURATION"
+            }
+        ]
+    },
+    {
+        "category": "DATA",
+        "id": 15,
+        "rule": "Equals",
+        "Form": "Value X = Value Y",
+        "description": "Value X must equal Value Y",
+        "example": "The amount requested and the loan offered must be the same",
+        "formFields": [
+            {
+                "name": "attribute_x",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "=",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "attribute_y",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE",
+                "dependsOn": "!check_enter_value"
+            },
+            {
+                "name": "value_y",
+                "label": "Enter Value",
+                "type": "DATA",
+                "dependsOn": "check_enter_value"
+            },
+            {
+                "name": "check_enter_value",
+                "label": "Enter value?",
+                "type": "CHECK"
+            }
+        ]
+    },
+    {
+        "category": "DATA",
+        "id": 16,
+        "rule": "Does not equal",
+        "Form": "Value X != Value Y",
+        "description": "Value X must not equal Value Y",
+        "example": "CAD must not equal 1",
+        "formFields": [
+            {
+                "name": "attribute_x",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "!=",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+
+            {
+                "name": "attribute_y",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE",
+                "dependsOn": "!check_enter_value"
+            },
+            {
+                "name": "value_y",
+                "label": "Enter Value",
+                "type": "NUMBER",
+                "dependsOn": "check_enter_value"
+            },
+            {
+                "name": "check_enter_value",
+                "label": "Enter value?",
+                "type": "CHECK"
+            }
+        ]
+    },
+    {
+        "category": "DATA",
+        "id": 17,
+        "rule": "Is greater than",
+        "Form": "Value X > Value Y",
+        "description": "Value X must be greater than Value Y",
+        "example": "The CAD rating must be at least level 2",
+        "formFields": [
+            {
+                "name": "attribute_x",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": ">",
+                "type": "TEXT"
+            },
+
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "attribute_y",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE",
+                "dependsOn": "!check_enter_value"
+            },
+            {
+                "name": "value_y",
+                "label": "Enter Value",
+                "type": "NUMBER",
+                "dependsOn": "check_enter_value"
+            },
+            {
+                "name": "check_enter_value",
+                "label": "Enter value?",
+                "type": "CHECK"
+            }
+        ]
+    },
+    {
+        "category": "DATA",
+        "id": 18,
+        "rule": "Is greater than or equals",
+        "Form": "Value X >= Value Y",
+        "description": "Value X must be greater than or equal to Value Y",
+        "example": "The application request must be for at least $50,000",
+        "formFields": [
+            {
+                "name": "attribute_x",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": ">=",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+
+            {
+                "name": "attribute_y",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE",
+                "dependsOn": "!check_enter_value"
+            },
+            {
+                "name": "value_y",
+                "label": "Enter Value",
+                "type": "NUMBER",
+                "dependsOn": "check_enter_value"
+            },
+            {
+                "name": "check_enter_value",
+                "label": "Enter value?",
+                "type": "CHECK"
+            }
+        ]
+    },
+    {
+        "category": "DATA",
+        "id": 19,
+        "rule": "Is less than",
+        "Form": "Value X < Value Y",
+        "description": "Value X must be less than Value Y",
+        "example": "The requested amount must be less than $2m",
+        "formFields": [
+            {
+                "name": "attribute_x",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "<",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+
+            {
+                "name": "attribute_y",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE",
+                "dependsOn": "!check_enter_value"
+            },
+            {
+                "name": "value_y",
+                "label": "Enter Value",
+                "type": "NUMBER",
+                "dependsOn": "check_enter_value"
+            },
+            {
+                "name": "check_enter_value",
+                "label": "Enter value?",
+                "type": "CHECK"
+            }
+        ]
+    },
+    {
+        "category": "DATA",
+        "id": 20,
+        "rule": "Is less than or equals",
+        "Form": "Value X <= Value Y",
+        "description": "Value X must be less than or equal to Value Y",
+        "example": "Offers must be less than or qual to the amount requested",
+        "formFields": [
+            {
+                "name": "attribute_x",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE"
+            },
+            {
+                "name": "column_break",
+                "type": "COLUMN_BREAK"
+            },
+            {
+                "name": "rule_text",
+                "text": "<=",
+                "type": "TEXT"
+            },
+            {
+                "name": "column_break_2",
+                "type": "COLUMN_BREAK"
+            },
+
+            {
+                "name": "attribute_y",
+                "label": "Select Attribute",
+                "type": "SELECT",
+                "selectFrom": "ATTRIBUTE",
+                "dependsOn": "!check_enter_value"
+            },
+            {
+                "name": "value_y",
+                "label": "Enter Value",
+                "type": "NUMBER",
+                "dependsOn": "check_enter_value"
+            },
+            {
+                "name": "check_enter_value",
+                "label": "Enter value?",
+                "type": "CHECK"
+            }
+        ]
+    }
+]

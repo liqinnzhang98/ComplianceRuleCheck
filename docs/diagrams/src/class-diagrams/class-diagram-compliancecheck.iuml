@@ -1,0 +1,97 @@
+@startuml class-diagram-compliancecheck
+
+package com.apromore.compliance_centre.compliancecheck {
+
+    enum ComplianceCheckStatus {
+        QUEUED
+        RUNNING
+        COMPLETED
+        FAILED
+    }
+
+    class ComplianceCheckController {
+        + Response<ComplianceCheckDto> getLastestReportForProcess(long processId)
+        + Response<List<ComplianceCheckDto>> getAllReportsForProcess(long processId)
+        + Response<ComplianceCheckDto> getReport(long processId, long reportId)
+        + Response<List<ComplianceCheckDto>> getAllReports()
+        + Response<ComplianceCheckDto> checkProcessCompliance(long processId)
+        - ComplianceCheckService complianceCheckService
+    }
+
+    class ComplianceCheckDto {
+        - long id
+        - Timestamp runAt
+        - ComplianceCheckStatus status
+        - ProcessDto process
+        - ComplianceCheckReport report
+    }
+
+    class ComplianceCheckModel {
+        - Long id
+        - Timestamp runAt
+        - ComplianceCheckStatus status
+        - ProcessModel process
+        - List<ComplianceViolationModel> violations
+    }
+
+    class ComplianceCheckReport {
+        - int totalCases
+        - int totalBreachedCases
+        - ReportStatsModel stats
+        - List<ReportBreaches> breaches
+    }
+
+    interface ComplianceCheckRepository {
+        List<ComplianceCheckModel> findByProcessId(long processId)
+    }
+
+    interface ComplianceCheckService {
+        + List<ComplianceCheckDto> getAllComplianceChecksForProcess(long processId)
+        + List<ComplianceCheckDto> getAllComplianceChecks()
+        + ComplianceCheckDto getComplianceCheckById(long complianceCheckId)
+        + ComplianceCheckReport getReportResults(long complianceCheckId)
+        + ComplianceCheckDto checkProcessCompliance(long processId)
+    }
+
+    interface ComplianceViolationRepository {
+    }
+
+    class ComplianceCheckServiceImpl {
+        - ComplianceCheckRepository complianceCheckRepository
+        - ProcessRepository processRepository
+        - TemplateRepository templateRepository
+        - ProcessService processService
+        - ComplianceRulesService complianceRulesService
+        - QueryGeneratorProvider queryGeneratorProvider
+        - QueryExecutor queryExecutor
+        + List<ComplianceCheckDto> getAllComplianceChecksForProcess(long processId)
+        + List<ComplianceCheckDto> getAllComplianceChecks()
+        + ComplianceCheckDto getComplianceCheckById(long complianceCheckId)
+        + ComplianceCheckReport getReportResults(long complianceCheckId)
+        + ComplianceCheckDto checkProcessCompliance(long processId)
+    }
+
+    class ComplianceViolationModel {
+        - long id
+        - String caseId
+        - ComplianceCheckModel complianceCheck
+        - ComplianceRulesModel complianceRule
+    }
+
+    ComplianceCheckDto "1" --- "1" ComplianceCheckStatus: status
+    ComplianceCheckDto "1" --- "1" ComplianceCheckReport: report
+    ComplianceCheckModel "1" --- "1" ComplianceCheckStatus: status
+    ComplianceCheckModel "1" --- "Many" ComplianceViolationModel: violations
+    ComplianceCheckServiceImpl --- ComplianceCheckRepository: complianceCheckRepository
+    ComplianceCheckServiceImpl --- ProcessRepository: processRepository
+    ComplianceCheckServiceImpl --- TemplateRepository: templateRepository
+    ComplianceCheckServiceImpl --- ProcessService: processService
+    ComplianceCheckServiceImpl --- ComplianceRulesService: complianceRulesService
+    ComplianceCheckServiceImpl --- QueryGeneratorProvider: queryGeneratorProvider
+    ComplianceCheckServiceImpl --- QueryExecutor: queryExecutor
+    ComplianceCheckServiceImpl --- ComplianceViolationRepository: complianceViolationRepository
+    ComplianceCheckService --- ComplianceCheckServiceImpl: implements
+    ComplianceCheckController --- ComplianceCheckService: complianceCheckService
+}
+
+@enduml

@@ -1,0 +1,53 @@
+@startuml class-diagram-process-attributes
+
+package com.apromore.compliance_centre.process.attributes {
+
+    enum AttributeDataType {
+        INT
+        FLOAT
+        TEXT
+        TIMESTAMP
+    }
+
+    enum AttributeType {
+        ATTRIBUTE
+        CASE_ID
+        ACTIVITY
+        RESOURCE
+        ROLE
+        START_TIMESTAMP
+        COMPLETE_TIMESTAMP
+        CASE_ATTRIBUTE
+        EVENT_ATTRIBUTE
+        IGNORE_ATTRIBUTE
+    }
+
+    class AttributeDto {
+        - Long id
+        - String name
+        - String displayName
+        - AttributeDataType dataType
+        - AttributeType type
+        + static AttributeDto fromModel(AttributeModel model)
+    }
+
+    class AttributeModel {
+        - Long id
+        - String name
+        - String displayName
+        - AttributeType type
+        - AttributeDataType dataType
+        - ProcessModel process
+        + String getDatabaseColumnName()
+        + AttributeType getAttributeType()
+        + static AttributeModel fromDto(AttributeDto dto)
+    }
+
+    AttributeDto "1" --- "1" AttributeDataType: dataType
+    AttributeDto "1" --- "1" AttributeType: type
+    AttributeModel "1" --- "1" AttributeDataType: dataType
+    AttributeModel "1" --- "1" AttributeType: type
+    AttributeModel "1" --- "1" ProcessModel: process
+}
+
+@enduml

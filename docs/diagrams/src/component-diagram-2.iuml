@@ -1,0 +1,59 @@
+@startuml
+
+skinparam linetype ortho
+skinparam titleBorderThickness 2
+skinparam TitleFontSize 18
+title Component Diagram
+
+left to right direction
+
+package frontend {
+	component SidebarUI
+	component ProcessPageUI
+	component UploadEventLogUI
+	component SchemaMapperUI
+	component RiskObligationRegisterTable
+	component UploadRiskObligationPopup
+	component UpsertRiskObligationPopup
+	component UpsertControlPopup
+	component MapControlToComplianceRuleTemplateUI
+	component FillComplianceRuleTemplatePopup
+	component RunComplianceRuleCheckPopup
+	component ComplianceRuleCheckResultsPage
+
+}
+
+package Backend {
+	component ProcessesAPI
+	component EventLogsAPI
+	component RiskObligationRegisterAPI
+	component ControlAPI
+	component ComplianceRuleTemplatesAPI
+	component ComplianceRuleGeneratorAPI
+	component ComplianceRuleCheckerAPI
+	component ComplianceRuleCheckResultsAPI
+
+}
+
+database MySQL #Khaki
+
+HTTP - Backend
+
+MySQL -- Backend
+
+
+[SidebarUI] --> [ProcessesAPI]
+[ProcessPageUI] --> [ProcessesAPI]
+[UploadEventLogUI] --> [EventLogsAPI]
+[SchemaMapperUI] --> [EventLogsAPI]
+
+[RiskObligationRegisterTable] --> [RiskObligationRegisterAPI]
+[UploadRiskObligationPopup] -> [RiskObligationRegisterAPI]
+[UpsertRiskObligationPopup] --> [RiskObligationRegisterAPI]
+[UpsertControlPopup] --> [ControlAPI]
+[MapControlToComplianceRuleTemplateUI] -> [ControlAPI]
+[FillComplianceRuleTemplatePopup] -> [ComplianceRuleTemplatesAPI]
+[FillComplianceRuleTemplatePopup] -> [ComplianceRuleGeneratorAPI]
+[RunComplianceRuleCheckPopup] -> [ComplianceRuleCheckerAPI]
+[ComplianceRuleCheckResultsPage] -> [ComplianceRuleCheckResultsAPI]
+@enduml

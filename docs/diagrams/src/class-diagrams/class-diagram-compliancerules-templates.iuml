@@ -1,0 +1,95 @@
+@startuml compliancerules-templates
+
+package compliancerules.templates {
+
+    enum TemplateCategory {
+        CONTROL_FLOW
+        RESOURCE
+        TIME
+        DATA
+    }
+
+    enum TemplateType {
+        CONTROL_FLOW_PRECEDES
+        CONTROL_FLOW_DIRECTLY_FOLLOWED_BY
+        CONTROL_FLOW_EVENTUALLY_FOLLOWED_BY
+        CONTROL_FLOW_EXISTS
+        RESOURCE_PERFORMED_BY
+        RESOURCE_SEGREGATED_FROM
+        RESOURCE_USER_SEGREGATED_FROM
+        RESOURCE_BOUNDED_WITH
+        RESOURCE_ROLE_BOUNDED_WITH
+        TIME_WITHIN_LEADS_TO
+        TIME_WITHIN_TASK_TIME
+        TIME_AT_LEAST_AFTER
+        TIME_EXACTLY_AT
+        TIME_EXACTLY_AFTER
+        DATA_EQUALS
+        DATA_IS_GREATER_THAN
+        DATA_IS_GREATER_THAN_OR_EQUALS
+        DATA_IS_LESS_THAN
+        DATA_IS_LESS_THAN_OR_EQUALS
+    }
+
+    class ComplianceRulesJsonConverter {
+        +convertToDatabaseColumn(List<List<ComplianceRulesItem>>): String
+        +convertToEntityAttribute(String): List<List<ComplianceRulesItem>>
+    }
+
+    class JsonListConverter<T> {
+        // Inherits from JsonConverter
+    }
+
+    class TemplateController {
+        +getAllTemplates(Optional<String>): Response<List<TemplateDto>>
+        +getTemplate(Long): Response<TemplateDto>
+        +getTemplatesByCategory(String): Response<List<TemplateDto>>
+    }
+
+    class TemplateDto {
+        Long id
+        String rule
+        String description
+        String example
+        String category
+        List<FormFieldDto> formFields
+        Float recommendation
+    }
+
+    class TemplateModel {
+        Long id
+        String rule
+        String description
+        String example
+        TemplateCategory category
+        List<String> formFieldsOrder
+        List<FormFieldModel> formFields
+    }
+
+    class TemplateRecommendationDto {
+        String controlDescription
+        Map<String, Float> recommendations
+    }
+
+    interface TemplateRepository extends JpaRepository {
+        +findByCategory(TemplateCategory): List<TemplateModel>
+    }
+
+    interface TemplateService {
+        +getTemplate(Long): TemplateDto
+        +getAllTemplates(): List<TemplateDto>
+        +getAllTemplatesMap(): HashMap<Long, TemplateDto>
+        +getTemplatesByCategory(TemplateCategory): List<TemplateDto>
+        +importTemplates(): List<TemplateDto>
+    }
+
+    class TemplateServiceImpl implements TemplateService {
+        +getTemplate(Long): TemplateDto
+        +getAllTemplates(): List<TemplateDto>
+        +getAllTemplatesMap(): HashMap<Long, TemplateDto>
+        +getTemplatesByCategory(TemplateCategory): List<TemplateDto>
+        +importTemplates(): List<TemplateDto>
+    }
+}
+
+@enduml

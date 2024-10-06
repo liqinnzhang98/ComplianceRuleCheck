@@ -1,0 +1,42 @@
+@startuml
+
+title Package Diagram
+
+top to bottom direction
+
+package eventlogs {}
+
+package process {
+	package attributes {}
+}
+
+eventlogs .> process : <<access>>
+
+package riskObligationRegister {
+	package controls {}
+	package riskObligation {}
+}
+
+package complianceCheck {}
+
+package complianceRules {
+	package templates {
+		package data {}
+		package controlSequence {}
+		package resource {}
+		package time {}
+	}
+	package queryExecutor {}
+	package queryGenerator {}
+}
+
+riskObligation .> controls : <<access>>
+controls ..> templates : <<access>>
+templates ..> process : <<access>>
+queryGenerator <.. complianceCheck : <<access>>
+queryExecutor <.. complianceCheck : <<access>>
+
+complianceRules -[hidden]- process
+complianceCheck -[hidden]- process
+
+@enduml

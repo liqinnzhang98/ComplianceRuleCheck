@@ -1,0 +1,44 @@
+@startuml class-diagram-compliancerules-formfields
+
+package compliancerules.templates.formfields {
+
+    enum FormFieldType {
+        TEXT
+        COLUMN_BREAK
+        DATA
+        NUMBER
+        CHECK
+        SELECT
+        TIME
+        DURATION
+    }
+
+    class FormFieldDto {
+        String name
+        String label
+        String text
+        FormFieldType type
+        AttributeType selectFrom
+        String dependsOn
+    }
+
+    class FormFieldModel {
+        Long id
+        String label
+        FormFieldType type
+        String name
+        String dependsOn
+        String text
+        AttributeType selectFrom
+        TemplateModel template
+    }
+
+    interface FormFieldRepository {
+    }
+
+    FormFieldDto ..> FormFieldModel: maps
+    FormFieldModel <-- FormFieldRepository: stores
+    FormFieldModel *-- TemplateModel: belongs to
+}
+
+@enduml

@@ -1,0 +1,121 @@
+@startuml domain-diagram
+
+title Domain Diagram
+skinparam linetype ortho
+
+
+entity process {
+  *id : INT <<generated>>
+  --
+  *name : VARCHAR
+}
+
+
+entity event_log {
+  *id : INT <<generated>>
+  --
+  *name : VARCHAR
+  created_at : TIMESTAMP
+  process_id : INT <<FK>>
+}
+
+entity "log_<<event_log_name>>" <dynamic> {
+    <<attribute_name_1>>
+    <<attribute_name_2>>
+    .
+    .
+    <<attribute_name_n>>
+
+}
+
+entity attribute {
+  *id : int <<generated>>
+  --
+  *name : VARCHAR
+  *display_name : VARCHAR
+  *type : VARCHAR
+  *data_type : VARCHAR
+  *process_id : INT <<FK>>
+}
+
+process ||--o{ event_log
+process ||--o{ attribute
+
+entity control {
+  *id : VARCHAR
+  --
+  *name : VARCHAR
+  *description : VARCHAR
+  *compliance_rule_category : VARCHAR <<enum>>
+  compliance_rule_templates : JSON <<array>>
+  *created_at : TIMESTAMP
+  *modified_at : TIMESTAMP
+}
+
+
+entity risk_obligation {
+  *id : VARCHAR
+  --
+  *name : VARCHAR
+  *type : VARCHAR <<enum>>
+  description : VARCHAR
+  *category : VARCHAR
+  *sub_category : VARCHAR
+}
+
+risk_obligation }|--|{ control
+
+
+entity compliance_rule_template {
+    *id : INT <<generated>>
+    --
+    *rule : VARCHAR
+    *description : VARCHAR
+    *category : VARCHAR <<enum>>
+    *form_fields_order: JSON <<array>>
+    example : VARCHAR
+}
+
+entity compliance_rule_template_form_field {
+    *id : INT <<generated>>
+    --
+    *compliance_rule_template_id : INT <<FK>>
+    *name : VARCHAR
+    *label : VARCHAR
+    *type : VARCHAR <<enum>>
+    text : VARCHAR
+    dependsOn : VARCHAR
+    selectFrom : VARCHAR
+}
+
+control }o..o{ compliance_rule_template
+compliance_rule_template ||--|{ compliance_rule_template_form_field
+
+
+entity compliance_rule {
+    *id : INT <<generated>>
+    --
+    *process_id: INT <<FK>>
+    *field_id: INT <<FK>>
+    value: VARCHAR
+}
+
+process ||--o{ compliance_rule
+compliance_rule_template_form_field ||--o{ compliance_rule
+
+
+entity compliance_check_log {
+  *id : INT <<generated>>
+  --
+  *process_id : INT <<FK>>
+  *run_at : TIMESTAMP
+  *status : VARCHAR <<enum>>
+  message : VARCHAR
+  *applied_controls : JSON <<array>>
+  *applied_event_logs : JSON <<array>>
+}
+
+process ||--o{ compliance_check_log
+control }o..|| compliance_check_log
+event_log }o..|| compliance_check_log
+@enduml

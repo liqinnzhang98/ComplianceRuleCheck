@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+    app:
+        image: pruthvi145/apromore_compliance_centre:${APP_VERSION:-latest}
+    caddy:
+        image: 'caddy:2.7'
+        ports:
+            - 80:80
+            - 443:443
+        env_file:
+            - .env
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    db:
+        image: 'mysql:8.0'
+        restart: always
+        environment:
+            - MYSQL_DATABASE
+            - MYSQL_ROOT_PASSWORD
+        volumes:
+            - mysql-data:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
+            timeout: 5s
+            retries: 10
+
+volumes:
+    mysql-data:

@@ -1,0 +1,113 @@
+name: Get Coverage for Back-end
+
+permissions:
+    contents: read
+    checks: write
+
+on:
+    push:
+        branches:
+            - development
+    pull_request:
+        types: [opened, synchronize, reopened]
+
+jobs:
+    get-coverage:
+        permissions: write-all
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                shell: bash
+                working-directory: ./
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+            - name: Shutdown Ubuntu MySQL (SUDO)
+              run: sudo service mysql stop # Shutdown the Default MySQL
+
+            #           the MySQL container receive incoming requests from the host machine through the exposed port of 3800,
+            #           and forward them to the application running inside the container on port number 3307.
+            - name: Set up MySQL
+              uses: mirromutth/mysql-action@v1.1
+              with:
+                  host port: 3800
+                  container port: 3307
+                  mysql database: 'test'
+                  mysql root password: 'root'
+                  mysql user: 'root'
+                  mysql password: 'root'
+
+            - name: Generate Testing Datasource Properties
+              run: |
+                  if [ ! -f datasource.properties ]; then
+                    echo 'spring.datasource.url=jdbc:mysql://localhost:3800/test
+                    spring.datasource.username=root
+                    spring.datasource.password=root
+                    spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+                    spring.jpa.hibernate.ddl-auto=update
+                    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+                    ' > datasource.properties
+                  fi
+                  cat datasource.properties
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
+              with:
+                  distribution: 'temurin'
+                  java-version: '17'
+                  cache: 'gradle'
+
+            - name: Run Coverage
+              run: ./gradlew testCoverage
+
+            - name: Upload Report
+              uses: 'actions/upload-artifact@v2'
+              with:
+                  name: report.xml
+                  path: ${{ github.workspace }}/backend/build/reports/jacoco/testCoverage/testCoverage.xml
+
+            - name: Jacoco Report to PR
+              id: jacoco
+              uses: madrapps/jacoco-report@v1.1
+              with:
+                  path: ${{ github.workspace }}/backend/build/reports/jacoco/testCoverage/testCoverage.xml
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  min-coverage-overall: 40
+                  min-coverage-changed-files: 60
+                  debug-mode: false
+
+            - name: JaCoCo Code Coverage Report
+              id: jacoco_reporter
+              uses: PavanMudigonda/jacoco-reporter@v4.5
+              with:
+                  coverage_results_path: ${{ github.workspace }}/backend/build/reports/jacoco/testCoverage/testCoverage.xml
+                  coverage_report_name: Coverage
+                  coverage_report_title: JaCoCo
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  skip_check_run: false
+                  minimum_coverage: 80
+                  fail_below_threshold: false
+                  publish_only_summary: true
+
+              # uploads the coverage-report.md artifact
+            - name: Upload Code Coverage Artifacts
+              uses: actions/upload-artifact@v2
+              with:
+                  name: code-coverage-report
+                  path: '*/coverage-results.md'
+                  retention-days: 1
+
+            - name: Get the Coverage info
+              run: |
+                  echo "Total coverage coverage-overall ${{ steps.jacoco.outputs.coverage-overall }}"
+                  echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
+                  echo "Coverage coveragePercentage ${{ steps.jacoco_reporter.outputs.coveragePercentage }}"
+                  echo "Coverage coveragePercentageString ${{ steps.jacoco_reporter.outputs.coveragePercentageString }}"
+
+            - name: Publish Coverager Workflow Build Summary
+              run: echo "${{ steps.jacoco_reporter.outputs.coverageSummary }}" >> $GITHUB_STEP_SUMMARY

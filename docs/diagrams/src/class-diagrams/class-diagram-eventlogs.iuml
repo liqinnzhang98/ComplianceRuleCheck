@@ -1,0 +1,82 @@
+@startuml class-diagram-eventlogs
+
+title Class Diagram: eventlogs
+
+package processes <<Folder>> {
+    class ProcessModel
+
+    ProcessModel "1" *-- "many" EventlogModel: has
+
+    package eventlogs <<Folder>> {
+        class EventlogModel {
+            - Long id
+            - String name
+            - String displayName
+            - Timestamp createdAt
+            - ProcessModel process
+            + getAttributes(): List<AttributeModel>
+            + getAttributeByType(AttributeType): AttributeModel
+            + getEventLogTableName(): String
+        }
+
+        class EventlogRepository {
+            # List<EventlogModel> findByProcessId(Long processId)
+            + createEventLogTable(EventLogModel, List<AttributeModel>)
+            + saveEventLogData(EventLogModel, List<AttributeModel>, List<List<String>>)
+            + getEventLogDataAttributeValues(EventLogModel, AttributeModel): List<String>
+        }
+
+        interface EventLogDataRepository {
+            + createEventLogTable(EventLogModel, List<AttributeModel>)
+            + saveEventLogData(EventLogModel, List<AttributeModel>, List<List<String>>)
+            + getEventLogDataAttributeValues(EventLogModel, AttributeModel): List<String>
+        }
+
+        class EventlogService {
+            # List<EventlogDto> getAllEventlogs()
+            # EventlogDto getEventlogById(long EventlogId)
+            # EventlogDto createNewEventlog(EventlogDto EventlogDto)
+            # List<EventlogDto> findEventlogsByProcessId(Long processId)
+            # List<String> getAttributeValues(EventLogModel, AttributeModel)
+        }
+
+        class EventlogServiceImpl {
+            - EventlogRepository EventlogRepository
+            - ProcessRepository processRepository
+            - ModelMapper modelMapper
+            + List<EventlogDto> getAllEventlogs()
+            + EventlogDto getEventlogById(long EventlogId)
+            + EventlogDto createNewEventlog(EventlogDto EventlogDto)
+            + List<EventlogDto> findEventlogsByProcessId(Long processId)
+            + uploadEventLogData(Long, MultipartFile): EventLogDto
+            + getAttributeValues(EventLogModel, AttributeModel): List<String>
+        }
+
+        class EventlogController {
+            - EventlogService EventlogService
+            + List<EventlogDto> getAllEventlogs()
+            + ResponseEntity<EventlogDto> getEventlogsById(Long id)
+            + EventlogDto createEventlog(EventlogDto EventlogDto)
+            + List<EventlogDto> getAllEventlogsByProcessId(Long processId)
+            + Response<EventLogDto> uploadEventLogData(Long, MultipartFile)
+        }
+
+        class EventlogDto {
+            - Long id
+            - String name
+            - Timestamp createdAt
+            - ProcessDto process
+            + {static} EventlogDto fromModel(EventlogModel Eventlog)
+        }
+
+        EventlogModel <-- EventlogRepository: stores
+        EventlogRepository <-- EventlogService: interacts with
+        EventlogService <-- EventlogController: calls
+        EventlogController <-> EventlogDto: communicates with
+        EventlogService ..> EventlogDto: maps
+        class EventlogServiceImpl implements EventlogService
+        class EventLogDataRepositoryImpl implements EventLogDataRepository
+    }
+}
+
+@enduml

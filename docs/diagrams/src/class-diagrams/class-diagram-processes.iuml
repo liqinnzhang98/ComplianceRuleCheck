@@ -1,0 +1,87 @@
+@startuml class-diagram-processes
+
+title Class Diagram: processes
+
+package processes <<Folder>> {
+    enum AttributeType {
+        ATTRIBUTEF
+        CASE_ID
+        ACTIVITY
+        RESOURCE
+        ROLE
+        START_TIMESTAMP
+        END_TIMESTAMP
+        CASE_ATTRIBUTE
+        EVENT_ATTRIBUTE
+    }
+
+    enum AttributeDataType {
+        INTEGER
+        REAL_NUMBER
+        STRING
+        TIMESTAMP
+    }
+
+    class ProcessModel {
+        Long id
+        String name
+        List<EventlogModel> Eventlogs
+        List<AttributeModel> attributes
+    }
+
+    ProcessModel "1" *-- "many" AttributeModel: has
+
+    class AttributeModel {
+        Long id
+        String name
+        String displayName
+        AttributeType type
+        AttributeDataType dataType
+    }
+
+    class ProcessRepository {
+        List<EventlogModel> findByProcessId(Long processId)
+    }
+
+    class AttributeRepository
+
+    class ProcessDto {
+        - Long id
+        - String name
+        {static} + ProcessDto fromModel(ProcessModel process)
+    }
+
+    class ProcessService {
+        List<ProcessDto> getAllProcesses()
+        ProcessDto getProcessById(long processId)
+        ProcessDto createNewProcess(ProcessDto processDto)
+        List<AttributeDto> getAttributes(long processId)
+        List<AttributeDto> saveAttributes(long processId, List<AttributeDto> attributeDtos)
+        Map<String, Set<String>> getMetadata(long processId)
+        List<String> getAllCases(long processId)
+    }
+
+    class ProcessController {
+        + Response<List<ProcessDto>> getAllProcesses()
+        + Response<List<EventLogDto>> getEventLogsForProcess(Long processId)
+        + Response<ProcessDto> createNewProcess(ProcessDto processDto)
+        + Response<ProcessDto> getProcessById(Long id)
+        + Response<List<AttributeDto>> getProcessSchema(Long id)
+        + Response<List<AttributeDto>> createProcessSchema(Long id, List<AttributeDto> attributes)
+        + Response<Map<String, Set<String>>> getEventlog(Long id)
+    }
+
+    ProcessModel -- eventLogs
+
+    package eventLogs <<Folder>> {
+    }
+
+    ProcessModel <-- ProcessRepository: stores
+    AttributeModel <-- AttributeRepository: stores
+    ProcessRepository <-- ProcessService: interacts with
+    ProcessService <-- ProcessController: calls
+    ProcessController <-> ProcessDto: communicates with
+    ProcessService ..> ProcessDto: maps
+}
+
+@enduml

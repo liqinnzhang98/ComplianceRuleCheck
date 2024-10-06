@@ -1,0 +1,29 @@
+name: Linters
+
+permissions:
+    contents: read
+    pull-requests: read
+
+on:
+    pull_request:
+
+jobs:
+    commit-lint:
+        name: Semantic Commits
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+            - name: Conventional Commit Message Check
+              uses: gsactions/commit-message-checker@v2
+              with:
+                  pattern: '^(?:(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|wip)(?:\(.+\))?:\s*.+|Merge.+)'
+                  flags: 'g'
+                  #   TODO: change the link to internal documentation
+                  error: 'Every commit must follow the conventional commit message format: https://www.conventionalcommits.org/en/v1.0.0/'
+                  excludeDescription: true
+                  checkAllCommitMessages: true
+                  accessToken: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,24 @@
+pluginManagement {
+    gradle.ext.springVersion = '3.0.5'
+    gradle.ext.springDependencyManagementVersion = '1.1.0'
+    gradle.ext.frontendPluginVersion = '6.0.0'
+    gradle.ext.lombokVersion = '1.18.24'
+    gradle.ext.mysqlVersion = '8.0.33'
+    gradle.ext.modelmapperVersion = '3.1.1'
+    gradle.ext.jakartaValidationVersion = '3.0.2'
+    gradle.ext.hibernateValidatorVersion = '8.0.0.Final'
+    gradle.ext.springdocVersion = '2.1.0'
+
+    plugins {
+        id 'java'
+        id 'war'
+        id 'org.springframework.boot' version gradle.springVersion
+        id 'io.spring.dependency-management' version gradle.springDependencyManagementVersion
+        id 'org.siouan.frontend-jdk11' version gradle.frontendPluginVersion
+    }
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+include 'backend', 'frontend'

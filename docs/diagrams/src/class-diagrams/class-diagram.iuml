@@ -1,0 +1,411 @@
+@startuml class-diagram
+
+abstract class Model
+abstract class Service
+abstract class Repository
+abstract class Dto
+abstract class Controller
+
+
+Model <-- Repository: stores
+Repository <-- Service: interacts with
+Service <-- Controller: calls
+Controller <-> Dto: communicates with
+Service ..> Dto: maps
+
+
+package processes <<Folder>> {
+    enum AttributeType {
+        ATTRIBUTEF
+        CASE_ID
+        ACTIVITY
+        RESOURCE
+        ROLE
+        START_TIMESTAMP
+        END_TIMESTAMP
+        CASE_ATTRIBUTE
+        EVENT_ATTRIBUTE
+    }
+
+    enum AttributeDataType {
+        INTEGER
+        REAL_NUMBER
+        STRING
+        TIMESTAMP
+    }
+
+    class ProcessModel {
+        Long id
+        String name
+
+        List<EventlogModel> Eventlogs
+        List<AttributeModel> attributes
+    }
+
+    ProcessModel "1" *-- "many" EventlogModel: has
+    ProcessModel "1" *-- "many" AttributeModel: has
+
+    class AttributeModel {
+        Long id
+        String name
+        String displayName
+        AttributeType type
+        AttributeDataType dataType
+    }
+
+    class ProcessRepository{
+        List<EventlogModel> findByProcessId(Long processId)
+    }
+
+    class AttributeRepository
+
+
+    class ProcessDto{
+        - Long id
+        - String name
+        {static} + ProcessDto fromModel(ProcessModel process)
+    }
+
+    class ProcessService {
+        List<ProcessDto> getProcesses()
+        ProcessDto getProcess(Long id)
+        ProcessDto createNewProcess(ProcessDto process)
+    }
+
+    class ProcessController {
+        + ProcessDto createProcess(ProcessDto process)
+        + ProcessDto updateProcess(ProcessDto process)
+        + ProcessDto deleteProcess(Long id)
+        + ProcessDto getProcess(Long id)
+        + List<ProcessDto> getProcesses()
+    }
+
+        package eventlogs <<Folder>> {
+        class EventlogModel {
+            - Long id
+            - String name
+            - String displayName
+            - DateTime createdAt
+            - ProcessModel process
+        }
+
+        class EventlogRepository {
+            # List<EventlogModel> findByProcessId(Long processId)
+        }
+
+        class EventlogService{
+            # List<EventlogDto> getAllEventlogs()
+            # EventlogDto getEventlogById(long EventlogId)
+            # EventlogDto createNewEventlog(EventlogDto EventlogDto)
+            # List<EventlogDto> findEventlogsByProcessId(Long processId)
+        }
+
+        class EventlogServiceImpl{
+            - EventlogRepository EventlogRepository
+            - ProcessRepository processRepository
+            - ModelMapper modelMapper
+            + List<EventlogDto> getAllEventlogs()
+            + EventlogDto getEventlogById(long EventlogId)
+            + EventlogDto createNewEventlog(EventlogDto EventlogDto)
+            + List<EventlogDto> findEventlogsByProcessId(Long processId)
+        }
+
+        class EventlogController{
+            - EventlogService EventlogService
+            - ProcessService processService
+            + List<EventlogDto> getAllEventlogs()
+            + ResponseEntity<EventlogDto> getEventlogsById(Long id)
+            + EventlogDto createEventlog(EventlogDto EventlogDto)
+            + List<EventlogDto> getAllEventlogsByProcessId(Long processId)
+        }
+
+        class EventlogDto {
+            - Long id
+            - String name
+            - DateTime createdAt
+            - ProcessDto process
+            + {static} EventlogDto fromModel(EventlogModel Eventlog)
+        }
+
+        EventlogModel <-- EventlogRepository: stores
+        EventlogRepository <-- EventlogService: interacts with
+        EventlogService <-- EventlogController: calls
+        EventlogController <-> EventlogDto: communicates with
+        EventlogService ..> EventlogDto: maps
+        class EventlogServiceImpl implements EventlogService
+    }
+
+    ProcessModel <-- ProcessRepository: stores
+    AttributeModel <-- AttributeRepository: stores
+
+    ProcessRepository <-- ProcessService: interacts with
+    ProcessService <-- ProcessController: calls
+    ProcessController <-> ProcessDto: communicates with
+    ProcessService ..> ProcessDto: maps
+}
+
+
+package riskobligationregister <<Folder>> {
+    class ControlModel {
+        Long id
+        String name
+        String description
+        String type
+
+        List<List<ComplianceRuleTemplate>> templates
+    }
+    note top of ControlModel
+        templates will be a list of lists
+        where the inner list is the`AND` composite
+        and the outer list is the `OR` composite
+        Stored in the db as JSON (JSON)
+    end note
+
+    class RiskObligationModel{
+        - Long id
+        - String type
+        - String name
+        - String description
+        - String category
+        - String subCategory
+        - List<ControlModel> controls
+    }
+
+    class ControlRepository
+
+    class RiskObligationRepository
+
+    class ControlDto {
+        - Long id,
+        - String description,
+        - String type,
+        - String name,
+        {static} ControlDto fromModel(ControlModel control)
+    }
+
+    class RiskObligationRegisterEntryDto {
+        - Long id
+        - String type
+        - String name
+        - String description
+        - String category
+        - String subCategory
+        - List<ControlDto> controls
+        {static} RiskObligationRegisterEntryDto fromModel(RiskObligationModel riskObligation)
+    }
+
+    class RiskObligationRegisterService {
+        List<RiskObligationDto> getAllRiskObligations()
+        RiskObligationDto getRiskObligationById(long riskObligationId)
+        RiskObligationDto createNewRiskObligation(RiskObligationDto riskObligationDto)
+        List<ControlDto> getAllControls()
+        ControlDto getControlById(long controlId)
+        ControlDto createNewControl(ControlDto controlDto)
+    }
+
+    class RiskObligationRegisterController {
+        - RiskObligationRegisterService riskObligationRegisterService
+        Response<List<RiskObligationDto>> getAllRiskObligations()
+        Response<RiskObligationDto> createNewRiskObligation(RiskObligationDto riskObligationDto)
+        Response<RiskObligationDto> getRiskObligationById(long id)
+        Response<List<ControlDto>> getAllControls()
+        Response<ControlDto> createNewControl(ControlDto controlDto)
+        Response<ControlDto> getControlById(long id)
+    }
+
+    RiskObligationModel <-- RiskObligationRepository: stores
+    ControlModel <-- ControlRepository: stores
+
+    RiskObligationRepository <-- RiskObligationRegisterService: interacts with
+    ControlRepository <-- RiskObligationRegisterService: interacts with
+
+    RiskObligationRegisterService <-- RiskObligationRegisterController: calls
+
+    RiskObligationRegisterController <-> RiskObligationRegisterEntryDto: communicates with
+
+    RiskObligationRegisterService ..> RiskObligationRegisterEntryDto: maps
+
+    RiskObligationRegisterEntryDto "1" -- "many" ControlDto: contains
+
+
+}
+
+
+package compliancerules {
+    package templates <<Folder>> {
+
+        enum ComplianceRuleTemplateCategory {
+            CONTROL_FLOW
+            RESOURCE
+            TIME
+            DATA
+        }
+
+        enum ComplianceRuleTemplateFormFieldType {
+            TEXT
+            COLUMN_BREAK
+            DATA
+            NUMBER
+            CHECK
+            SELECT
+            TIME
+            DURATION
+        }
+        class ComplianceRuleTemplateModel {
+            Long id
+            String rule
+            String? description
+            String? example
+
+            ComplianceRuleTemplateCategory category
+            List<ComplianceRuleTemplateFormFieldModel> formFields
+        }
+
+        class ComplianceRuleTemplateFormFieldModel {
+            Long id
+            String name
+            String? label
+            String? text
+            String? dependsOn
+
+            ComplianceRuleTemplateFormFieldType type
+            AttributeType? selectFrom
+        }
+
+        class ComplianceRuleTemplateRepository
+
+        class ComplianceRuleTemplateFormFieldRepository
+
+        class ComplianceRuleTemplateDto {
+            Long id
+            String rule
+            String description
+            String example
+
+            ComplianceRuleTemplateCategory category
+            List<ComplianceRuleTemplateFormFieldDto> formFields
+        }
+
+
+        class ComplianceRuleTemplateFormFieldDto {
+            Long id
+            String name
+            String? label
+            String? text
+            String? dependsOn
+            String type
+            String? selectFrom
+
+            List<String> options
+            String? defaultValue
+        }
+
+        class ComplianceRuleTemplateService
+
+        class ComplianceRuleTemplateController {
+            List<ComplianceRuleTemplateDto> getComplianceRuleTemplates()
+        }
+
+        ComplianceRuleTemplateModel <-- ComplianceRuleTemplateRepository: stores
+        ComplianceRuleTemplateRepository <-- ComplianceRuleTemplateService: interacts with
+        ComplianceRuleTemplateService <-- ComplianceRuleTemplateController: calls
+        ComplianceRuleTemplateController <-> ComplianceRuleTemplateDto: communicates with
+        ComplianceRuleTemplateService ..> ComplianceRuleTemplateDto: maps
+
+        ComplianceRuleTemplateFormFieldModel <-- ComplianceRuleTemplateFormFieldRepository: stores
+        ComplianceRuleTemplateModel *-- ComplianceRuleTemplateFormFieldModel: has
+        ComplianceRuleTemplateDto *-- ComplianceRuleTemplateFormFieldDto: has
+
+    }
+
+    class ComplianceRuleFieldModel {
+        Long id
+        Process process
+        ComplianceRuleFormField field
+        String value
+    }
+}
+
+package compliancecheck {
+    enum ComplianceCheckStatus {
+        QUEUED
+        RUNNING
+        COMPLETED
+        FAILED
+    }
+
+    class ComplianceCheckController {
+        + Response<ComplianceCheckDto> getLastestReportForProcess(long processId)
+        + Response<List<ComplianceCheckDto>> getAllReportsForProcess(long processId)
+        + Response<ComplianceCheckDto> getReport(long processId, long reportId)
+        + Response<List<ComplianceCheckDto>> getAllReports()
+        + Response<ComplianceCheckDto> checkProcessCompliance(long processId)
+    }
+
+    ComplianceCheckController --- ComplianceCheckServiceImpl: complianceCheckService
+
+    class ComplianceCheckDto {
+        - long id
+        - Timestamp runAt
+    }
+
+    class ComplianceCheckModel {
+        - long id
+        - Timestamp runAt
+    }
+
+    ComplianceCheckDto "1" --- "1" ComplianceCheckStatus: status
+    ComplianceCheckDto "1" --- "1" ComplianceCheckReport: report
+    ComplianceCheckDto "1" --- "1" ProcessDto: process
+    ComplianceCheckModel "1" --- "1" ComplianceCheckStatus: status
+    ComplianceCheckModel "1" --- "1" ComplianceCheckReport: report
+    ComplianceCheckModel "1" --- "Many" ComplianceViolationModel: violations
+    ComplianceCheckModel "1" --- "1" ProcessModel: process
+
+    class ComplianceCheckReport {
+        - int totalCases
+        - int totalBreachedCases
+        - ReportStatsModel stats
+        - Map<Long, List<String>> breaches
+    }
+
+    class ComplianceCheckRepository {
+        List<ComplianceCheckModel> findByProcessId(long processId);
+    }
+
+    interface ComplianceCheckService {
+        + List<ComplianceCheckDto> getAllComplianceChecksForProcess(long processId)
+        + List<ComplianceCheckDto> getAllComplianceChecks()
+        + ComplianceCheckDto getComplianceCheckById(long complianceCheckId)
+        + ComplianceCheckReport getReportResults(long complianceCheckId)
+        + ComplianceCheckDto checkProcessCompliance(long processId)
+    }
+
+    class ComplianceCheckServiceImpl {
+        + List<ComplianceCheckDto> getAllComplianceChecksForProcess(long processId)
+        + List<ComplianceCheckDto> getAllComplianceChecks()
+        + ComplianceCheckDto getComplianceCheckById(long complianceCheckId)
+        + ComplianceCheckReport getReportResults(long complianceCheckId)
+        + ComplianceCheckDto checkProcessCompliance(long processId)
+    }
+
+    ComplianceCheckServiceImpl --- ComplianceCheckRepository: complianceCheckRepository
+    ComplianceCheckServiceImpl --- ComplianceViolationRepository: complianceViolationRepository
+    ComplianceCheckServiceImpl --- ProcessService: processService
+    ComplianceCheckServiceImpl --- ComplianceRulesService: complianceRulesServie
+    ComplianceCheckService --- ComplianceCheckServiceImpl: implements
+
+    class ComplianceViolationModel {
+        long id
+        String caseId
+    }
+
+    class ComplianceViolationRepository {
+        
+    }
+
+    ComplianceCheckModel "1" --- "Many" ComplianceViolationModel: violations
+    ComplianceRulesModel "1" --- "Many" ComplianceViolationModel: complianceRules
+}
+
+

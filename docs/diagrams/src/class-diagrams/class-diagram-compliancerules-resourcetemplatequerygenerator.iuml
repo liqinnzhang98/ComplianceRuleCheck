@@ -1,0 +1,52 @@
+@startuml
+
+abstract class QueryGenerator {
+  - eventLog: EventLogModel
+  - templateValues: Map<String, String>
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ResourceBoundedWithQueryGenerator {
+  - taskOne: String
+  - taskTwo: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ResourcePerformedByQueryGenerator {
+  - taskT: String
+  - resourceR: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ResourceRoleBoundedWithQueryGenerator {
+  - taskOne: String
+  - taskTwo: String
+  - roleR: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ResourceSegregatedFromQueryGenerator {
+  - taskOne: String
+  - taskTwo: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+class ResourceUserSegregatedFromQueryGenerator {
+  - taskOne: String
+  - taskTwo: String
+  + processQueryParameters(Map<String, String>): void
+  + getQuery(): String
+}
+
+QueryGenerator <|-- ResourceBoundedWithQueryGenerator
+QueryGenerator <|-- ResourcePerformedByQueryGenerator
+QueryGenerator <|-- ResourceRoleBoundedWithQueryGenerator
+QueryGenerator <|-- ResourceSegregatedFromQueryGenerator
+QueryGenerator <|-- ResourceUserSegregatedFromQueryGenerator
+
+@enduml

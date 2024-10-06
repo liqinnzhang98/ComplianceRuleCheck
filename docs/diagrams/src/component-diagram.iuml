@@ -1,0 +1,68 @@
+@startuml
+
+' skinparam linetype ortho
+skinparam titleBorderThickness 2
+skinparam TitleFontSize 18
+title Component Diagram
+
+left to right direction
+
+component Process {
+	component SidebarUI
+	component ProcessPageUI
+
+	component ProcessesAPI #Khaki
+
+	component EventLog {
+	component UploadEventLogUI
+	component SchemaMapperUI
+
+	component EventLogsAPI #Khaki
+	}
+}
+
+
+component RiskObligationRegister {
+	component RiskObligationRegisterTable
+	component UploadRiskObligationPopup
+	component UpsertRiskObligationPopup
+
+	component RiskObligationRegisterAPI #Khaki
+
+	component Controls {
+		component UpsertControlPopup
+		component MapControlToComplianceRuleTemplateUI
+
+		component ControlAPI #Khaki
+	}
+}
+
+
+component ComplianceRules {
+	component FillComplianceRuleTemplatePopup
+	component RunComplianceRuleCheckPopup
+	component ComplianceRuleCheckResultsPage
+
+	component ComplianceRuleTemplatesAPI #Khaki
+	component ComplianceRuleGeneratorAPI #Khaki
+	component ComplianceRuleCheckerAPI #Khaki
+
+	component ComplianceRuleCheckResultsAPI #Khaki
+}
+
+
+[SidebarUI] --> [ProcessesAPI]
+[ProcessPageUI] --> [ProcessesAPI]
+[UploadEventLogUI] --> [EventLogsAPI]
+[SchemaMapperUI] --> [EventLogsAPI]
+
+[RiskObligationRegisterTable] --> [RiskObligationRegisterAPI]
+[UploadRiskObligationPopup] -> [RiskObligationRegisterAPI]
+[UpsertRiskObligationPopup] --> [RiskObligationRegisterAPI]
+[UpsertControlPopup] --> [ControlAPI]
+[MapControlToComplianceRuleTemplateUI] -> [ControlAPI]
+[FillComplianceRuleTemplatePopup] -> [ComplianceRuleTemplatesAPI]
+[FillComplianceRuleTemplatePopup] -> [ComplianceRuleGeneratorAPI]
+[RunComplianceRuleCheckPopup] -> [ComplianceRuleCheckerAPI]
+[ComplianceRuleCheckResultsPage] -> [ComplianceRuleCheckResultsAPI]
+@enduml

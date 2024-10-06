@@ -1,0 +1,105 @@
+@startuml class-diagram-compliancerules
+
+package compliancerules {
+    package templates <<Folder>> {
+        enum ComplianceRuleTemplateCategory {
+            CONTROL_FLOW
+            RESOURCE
+            TIME
+            DATA
+        }
+
+        enum ComplianceRuleTemplateFormFieldType {
+            TEXT
+            COLUMN_BREAK
+            DATA
+            NUMBER
+            CHECK
+            SELECT
+            TIME
+            DURATION
+        }
+
+        class ComplianceRuleTemplateModel {
+            Long id
+            String rule
+            String? description
+            String? example
+            ComplianceRuleTemplateCategory category
+            List<ComplianceRuleTemplateFormFieldModel> formFields
+        }
+
+        class ComplianceRuleTemplateFormFieldModel {
+            Long id
+            String name
+            String? label
+            String? text
+            String? dependsOn
+            ComplianceRuleTemplateFormFieldType type
+            AttributeType? selectFrom
+        }
+
+        class ComplianceRuleTemplateRepository
+        class ComplianceRuleTemplateFormFieldRepository
+        class ComplianceRuleTemplateService
+        class ComplianceRuleTemplateController {
+            List<ComplianceRuleTemplateDto> getComplianceRuleTemplates()
+        }
+    }
+
+    class ComplianceRuleFieldModel {
+        Long id
+        Process process
+        ComplianceRuleFormField field
+        String value
+    }
+
+    class ComplianceRulesController {
+        ComplianceRulesService rulesService
+        ObjectMapper objectMapper
+    }
+
+    class ComplianceRulesDto {
+        long id
+        long processId
+        long controlId
+        List<List<ComplianceRulesItem>> rules
+    }
+
+    class ComplianceRulesItem {
+        long templateId
+        HashMap<String, String> values
+    }
+
+    class ComplianceRulesModel {
+        long id
+        ProcessModel process
+        ControlModel control
+        List<List<ComplianceRulesItem>> rules
+        List<ComplianceViolationModel> violations
+    }
+
+    class ComplianceRulesRepository {
+        List<ComplianceRulesModel> findByProcessId(Long processId)
+        List<ComplianceRulesModel> findByControlId(Long controlId)
+    }
+
+    class ComplianceRulesService {
+        ComplianceRulesDto saveComplianceRules(ComplianceRulesDto dto)
+        List<ComplianceRulesDto> getComplianceRulesByProcess(long process)
+        List<ComplianceRulesDto> getComplianceRulesByControl(long control)
+    }
+
+    class ComplianceRulesServiceImpl {
+        ComplianceRulesRepository rulesRepository
+        ProcessRepository processRepository
+        ControlRepository controlRepository
+        ModelMapper modelMapper
+    }
+
+    class HashMapToJsonConverter {
+        ObjectMapper objectMapper
+    }
+}
+
+@enduml

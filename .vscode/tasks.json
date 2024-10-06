@@ -1,0 +1,119 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "./gradlew build"
+        },
+        {
+            "label": "Generate Datasource Properties",
+            "type": "shell",
+            "command": "if [ ! -f datasource.properties ]; then echo 'spring.datasource.url=jdbc:mysql://HOST:PORT/YOUR_DATABASE_NAME\nspring.datasource.username=PLACEHOLDER\nspring.datasource.password=PLACEHOLDER' > datasource.properties; fi"
+        },
+        {
+            "label": "Install Python Requirements",
+            "type": "shell",
+            "command": "pip install -r recommendation_engine/requirements.txt"
+        },
+        {
+            "label": "Reconfigure Hook Path",
+            "type": "shell",
+            "command": "git config core.hooksPath .git-hooks"
+        },
+        {
+            "label": "Stop All Tasks",
+            "command": "echo ${input:terminate}",
+            "type": "shell",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start Python Server",
+            "type": "shell",
+            "command": "uvicorn recommendation_engine.template_recommendation_api:app"
+        },
+        {
+            "label": "Overall System Build",
+            "type": "shell",
+            "command": "./gradlew bootRun"
+        },
+        {
+            "label": "Start Debug Server",
+            "type": "shell",
+            "command": "./gradlew bootRun --debug-jvm",
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "base": "$gradle",
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "Executing task: ./gradlew bootRun --debug-jvm",
+                        "endsPattern": "Listening for transport dt_socket at address: 5005"
+                    }
+                }
+            ],
+            "dependsOn": ["kill-java"]
+        },
+        {
+            "label": "Start Backend Debug",
+            "type": "shell",
+            "command": "${command:workbench.action.debug.start}"
+        },
+        {
+            "label": "Backend Hot Reload",
+            "type": "shell",
+            "command": "./gradlew build --continuous"
+        },
+        {
+            "label": "Frontend Hot Reload",
+            "type": "shell",
+            "command": "./node/bin/npm run dev",
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            }
+        },
+        {
+            "label": "kill-java",
+            "type": "shell",
+            "command": "pkill",
+            "args": ["java"]
+        },
+        {
+            "label": "Init",
+            "dependsOn": [
+                "Build",
+                "Generate Datasource Properties",
+                "Reconfigure Hook Path",
+                "Install Python Requirements"
+            ]
+        },
+        {
+            "label": "Start Non-Dev Server",
+            "dependsOn": ["Overall System Build", "Start Python Server"]
+        },
+        {
+            "label": "Start Backend Dev",
+            "dependsOn": ["Overall System Build", "Backend Hot Reload", "Start Python Server"]
+        },
+        {
+            "label": "Start Frontend Dev",
+            "dependsOn": ["Overall System Build", "Frontend Hot Reload", "Start Python Server"]
+        },
+        {
+            "label": "Start Fullstack Dev",
+            "dependsOn": ["Overall System Build", "Backend Hot Reload", "Frontend Hot Reload", "Start Python Server"]
+        },
+        {
+            "label": "Start Fullstack Dev (w/ Debug)",
+            "dependsOn": ["Start Debug Server", "Backend Hot Reload", "Frontend Hot Reload", "Start Python Server"]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "terminate",
+            "type": "command",
+            "command": "workbench.action.tasks.terminate",
+            "args": "terminateAll"
+        }
+    ]
+}

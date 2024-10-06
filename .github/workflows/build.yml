@@ -1,0 +1,68 @@
+name: Build and Test
+
+permissions:
+    contents: read
+    checks: write
+
+on:
+    push:
+        branches:
+            - development
+    pull_request:
+        types: [opened, synchronize, reopened]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                shell: bash
+                working-directory: ./
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+            - name: Shutdown Ubuntu MySQL (SUDO)
+              run: sudo service mysql stop # Shutdown the Default MySQL
+
+            #           the MySQL container receive incoming requests from the host machine through the exposed port of 3800,
+            #           and forward them to the application running inside the container on port number 3307.
+            - name: Set up MySQL
+              uses: mirromutth/mysql-action@v1.1
+              with:
+                  host port: 3800
+                  container port: 3307
+                  mysql database: 'test'
+                  mysql root password: 'root'
+                  mysql user: 'root'
+                  mysql password: 'root'
+
+            - name: Generate Testing Datasource Properties
+              run: |
+                  if [ ! -f datasource.properties ]; then
+                    echo 'spring.datasource.url=jdbc:mysql://localhost:3800/test
+                    spring.datasource.username=root
+                    spring.datasource.password=root
+                    ' > datasource.properties
+                  fi
+                  cat datasource.properties
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
+              with:
+                  distribution: 'temurin'
+                  java-version: '17'
+                  cache: 'gradle'
+
+            - name: Build with Gradle
+              run: ./gradlew build --no-daemon --stacktrace
+
+            - name: Publish Test Report
+              uses: mikepenz/action-junit-report@v3
+              if: success() || failure() # always run even if the previous step fails
+              with:
+                  report_paths: '**/build/test-results/test/TEST-*.xml'

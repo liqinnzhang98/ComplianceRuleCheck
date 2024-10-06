@@ -1,0 +1,82 @@
+@startuml class-diagram-riskobligationregister
+
+title Class Diagram: riskobligationregister
+
+package riskobligationregister <<Folder>> {
+    class ControlModel {
+        - Long id
+        - String type
+        - String name
+        - String description
+        - List<List<Long>> mappedTemplateIds
+    }
+
+    class RiskObligationModel {
+        - Long id
+        - String type
+        - String name
+        - String description
+        - String category
+        - String subCategory
+        - List<ControlModel> controls
+    }
+
+    class ControlRepository
+    class RiskObligationRepository
+
+    class ControlDto {
+        - Long id
+        - String type
+        - String name
+        - String description
+        - List<List<TemplateDto>> templates
+        {static} ControlDto fromModel(ControlModel control)
+    }
+
+    class RiskObligationRegisterEntryDto {
+        - Long id
+        - String type
+        - String name
+        - String description
+        - String category
+        - String subCategory
+        - List<ControlDto> controls
+        {static} RiskObligationRegisterEntryDto fromModel(RiskObligationModel riskObligation)
+    }
+
+    class RiskObligationRegisterService {
+        + List<RiskObligationDto> getAllRiskObligations()
+        + RiskObligationDto getRiskObligationById(long riskObligationId)
+        + RiskObligationDto createNewRiskObligation(RiskObligationDto riskObligationDto)
+        + List<ControlDto> getAllControls()
+        + ControlDto getControlById(long controlId)
+        + ControlDto createNewControl(ControlDto controlDto)
+        + ControlDto updateControl(long controlId, ControlDto controlDto)
+    }
+
+    class RiskObligationRegisterController {
+        - RiskObligationRegisterService riskObligationRegisterService
+        + Response<List<RiskObligationDto>> getAllRiskObligations()
+        + Response<RiskObligationDto> createNewRiskObligation(RiskObligationDto riskObligationDto)
+        + Response<RiskObligationDto> getRiskObligationById(long id)
+        + Response<List<ControlDto>> getAllControls()
+        + Response<ControlDto> createNewControl(ControlDto controlDto)
+        + Response<ControlDto> getControlById(long id)
+    }
+
+    RiskObligationModel <-- RiskObligationRepository: stores
+    ControlModel <-- ControlRepository: stores
+
+    RiskObligationRepository <-- RiskObligationRegisterService: interacts with
+    ControlRepository <-- RiskObligationRegisterService: interacts with
+
+    RiskObligationRegisterService <-- RiskObligationRegisterController: calls
+
+    RiskObligationRegisterController <-> RiskObligationRegisterEntryDto: communicates with
+
+    RiskObligationRegisterService ..> RiskObligationRegisterEntryDto: maps
+
+    RiskObligationRegisterEntryDto "1" -- "many" ControlDto: contains
+}
+
+@enduml

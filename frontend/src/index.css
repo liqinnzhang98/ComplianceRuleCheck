@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    @font-face {
+        font-family: 'Source Sans Pro';
+        font-weight: 400;
+        src: url(assets/fonts/sourcesanspro-regular.woff2);
+    }
+
+    @font-face {
+        font-family: 'Source Sans Pro';
+        font-weight: 700;
+        src: url(assets/fonts/sourcesanspro-bold.woff2);
+    }
+
+    @font-face {
+        font-family: 'Gilroy-Light';
+        src: url(assets/fonts/Gilroy-Light.woff2);
+    }
+
+    @font-face {
+        font-family: 'Gilroy-ExtraBold';
+        src: url(assets/fonts/Gilroy-ExtraBold.woff2);
+    }
+
+    body {
+        overflow: hidden;
+    }
+}

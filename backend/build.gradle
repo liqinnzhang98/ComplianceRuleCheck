@@ -1,0 +1,105 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management'
+    id 'jacoco'
+}
+
+group = 'com.apromore'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+bootWar {
+    baseName = 'compliance_centre'
+    archiveName 'ROOT.war'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:' + gradle.springVersion
+	implementation 'org.springframework.boot:spring-boot-starter-web:' + gradle.springVersion
+    implementation 'org.modelmapper:modelmapper:' + gradle.modelmapperVersion
+    implementation 'jakarta.validation:jakarta.validation-api:' + gradle.jakartaValidationVersion
+    implementation 'org.hibernate:hibernate-validator:' + gradle.hibernateValidatorVersion
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:' + gradle.springdocVersion
+	developmentOnly 'org.springframework.boot:spring-boot-devtools:' + gradle.springVersion
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:' + gradle.springVersion
+	compileOnly 'org.projectlombok:lombok:' + gradle.lombokVersion
+	annotationProcessor 'org.projectlombok:lombok:' + gradle.lombokVersion
+	runtimeOnly 'com.mysql:mysql-connector-j:' + gradle.mysqlVersion
+	implementation 'org.apache.commons:commons-csv:1.8'
+}
+
+jacoco{
+
+}
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.register('copyDatasourceConfig', Copy) {
+    from file("${project.rootDir}/datasource.properties")
+    into file("${project.buildDir}/resources/main")
+}
+
+tasks.register('processFrontendResources', Copy) {
+    // Directory containing the artifacts in the frontend project
+    def frontendBuildDir = file("${project(':frontend').buildDir}")
+    // Directory where the frontend artifacts must be copied to be packaged alltogether with the backend by the 'war'
+    // plugin.
+    def frontendResourcesDir = file("${project.buildDir}/resources/main/public")
+
+    group 'Frontend'
+    description 'Process frontend resources'
+    dependsOn project(':frontend').tasks.named('assembleFrontend')
+
+    from frontendBuildDir
+    into frontendResourcesDir
+}
+
+tasks.named('processResources') {
+    dependsOn tasks.named('processFrontendResources')
+    dependsOn tasks.named('copyDatasourceConfig')
+}
+
+tasks.create(name: "testCoverage", type: JacocoReport, dependsOn: "test") {
+
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for the test build."
+
+    reports {
+        html.enabled = true
+        xml.enabled = true
+    }
+
+    def excludes = [
+            '**/*Test*.*',
+            '**/actions/*.*',
+            '**/core/*.*',
+            '**/markers/*.*',
+            '**/services/**/*.*',
+            '**/toolwindow/*.*',
+            '**/utils/*.*'
+    ]
+
+    def javaClasses = fileTree(dir: "${buildDir}/classes/java/main", excludes: excludes)
+    def kotlinClasses = fileTree(dir: "${buildDir}/classes/kotlin/main", excludes: excludes)
+    classDirectories.from = files([javaClasses, kotlinClasses])
+
+    sourceDirectories.from = files([
+            "$project.projectDir/src/main/java",
+            "$project.projectDir/src/main/kotlin",
+            "$buildDir/generated/source/kapt/test"
+    ])
+
+    executionData.from = files("${project.buildDir}/jacoco/test.exec")
+}
